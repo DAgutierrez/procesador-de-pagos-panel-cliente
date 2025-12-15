@@ -1,0 +1,27 @@
+.toku-logo {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #000000;
+  letter-spacing: -0.5px;
+}
+
+.toku-o {
+  position: relative;
+  display: inline-block;
+}
+
+.toku-arrow {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  color: #000000;
+}
+
+
+
+

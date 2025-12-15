@@ -1,0 +1,84 @@
+.payment-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.payment-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.payment-card-text {
+  flex: 1;
+}
+
+.payment-card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 0.5rem;
+}
+
+.payment-card-subtitle {
+  font-size: 1rem;
+  color: #666666;
+  margin: 0;
+}
+
+.payment-card-button {
+  padding: 0.875rem 2rem;
+  background-color: #ff6b35;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.payment-card-button:hover {
+  background-color: #e55a2b;
+}
+
+.payment-card-button:active {
+  background-color: #cc4f24;
+}
+
+.payment-card-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.payment-card-button:disabled:hover {
+  background-color: #cccccc;
+}
+
+@media (max-width: 768px) {
+  .payment-card {
+    padding: 1.5rem;
+  }
+
+  .payment-card-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .payment-card-button {
+    width: 100%;
+  }
+
+  .payment-card-title {
+    font-size: 1.25rem;
+  }
+}
+
+
