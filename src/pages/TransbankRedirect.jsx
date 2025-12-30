@@ -95,3 +95,8 @@ function TransbankRedirect() {
 export default TransbankRedirect
 
 
+
+
+
+
+

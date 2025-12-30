@@ -7,7 +7,7 @@ function PaymentCard({ onRegisterPayment, isLoading = false }) {
       <div className="payment-card-content">
         <div className="payment-card-text">
           <h2 className="payment-card-title">
-            ¡No tienes cuotas disponibles para pago!
+            ¡No tienes deuda vencida!
           </h2>
           <p className="payment-card-subtitle">
             Inscribe un medio de pago y despreocúpate

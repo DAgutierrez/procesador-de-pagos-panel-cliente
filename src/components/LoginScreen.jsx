@@ -5,19 +5,57 @@ import LoginForm from './LoginForm'
 import Footer from './Footer'
 import './LoginScreen.css'
 
+const FIND_CUSTOMER_URL =
+  'https://ovukfntlauhftpwymvdr.supabase.co/functions/v1/find-customer'
+
 function LoginScreen() {
   const [rut, setRut] = useState('')
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Aquí iría la lógica de autenticación
-    // Por ahora, redirigimos a un customer_id de ejemplo
-    // En producción, esto vendría de la respuesta de la API
-    if (rut.trim()) {
-      // Ejemplo: usar el RUT como customer_id o hacer una llamada a la API
-      const customerId = rut.trim().replace(/[^0-9]/g, '') || 'demo'
-      navigate(`/dashboard/${customerId}`)
+
+    const textTofind = rut.trim()
+    if (!textTofind) {
+      return
+    }
+
+    try {
+      setLoading(true)
+
+      const response = await fetch(FIND_CUSTOMER_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ textTofind }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Error en la búsqueda de cliente: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      if (data.error === 'no existe registro') {
+        alert('No se encuentra cliente')
+        return
+      }
+
+      if (data.customer_id) {
+        navigate(`/dashboard/${data.customer_id}`)
+        return
+      }
+
+      // Respuesta inesperada
+      console.error('Respuesta inesperada de find-customer:', data)
+      alert('No se encuentra cliente')
+    } catch (error) {
+      console.error('Error al buscar cliente:', error)
+      alert('No se encuentra cliente')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -25,7 +63,12 @@ function LoginScreen() {
     <div className="login-screen">
       <Header />
       <main className="login-main">
-        <LoginForm rut={rut} setRut={setRut} onSubmit={handleSubmit} />
+        <LoginForm
+          rut={rut}
+          setRut={setRut}
+          onSubmit={handleSubmit}
+          isLoading={loading}
+        />
       </main>
       <Footer />
     </div>

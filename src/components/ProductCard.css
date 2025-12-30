@@ -52,11 +52,20 @@
   align-items: center;
 }
 
+.payment-method-icon-empty {
+  opacity: 0.7;
+}
+
 .payment-method-text {
   font-size: 0.95rem;
   color: #000000;
   font-weight: 500;
   flex: 1;
+}
+
+.payment-method-text-empty {
+  color: #999999;
+  font-weight: 400;
 }
 
 .payment-warning-icon {

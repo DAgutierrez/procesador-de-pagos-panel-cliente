@@ -1,7 +1,7 @@
 import React from 'react'
 import './LoginForm.css'
 
-function LoginForm({ rut, setRut, onSubmit }) {
+function LoginForm({ rut, setRut, onSubmit, isLoading = false }) {
   return (
     <div className="login-form-container">
       <div className="login-form-card">
@@ -17,6 +17,7 @@ function LoginForm({ rut, setRut, onSubmit }) {
             onChange={(e) => setRut(e.target.value)}
             className="login-input"
             placeholder=""
+            disabled={isLoading}
           />
           <div className="recaptcha-notice">
             Este sitio está protegido por reCAPTCHA y se aplican la{' '}
@@ -39,8 +40,8 @@ function LoginForm({ rut, setRut, onSubmit }) {
             </a>{' '}
             de Google.
           </div>
-          <button type="submit" className="login-button">
-            Ingresar
+          <button type="submit" className="login-button" disabled={isLoading}>
+            {isLoading ? 'Buscando cliente...' : 'Ingresar'}
           </button>
         </form>
       </div>
@@ -49,6 +50,7 @@ function LoginForm({ rut, setRut, onSubmit }) {
 }
 
 export default LoginForm
+
 
 
 

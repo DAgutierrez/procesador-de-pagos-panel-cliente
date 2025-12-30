@@ -11,7 +11,8 @@ import {
 } from '../utils/storage'
 import './Dashboard.css'
 
-const API_URL = 'https://ovukfntlauhftpwymvdr.supabase.co/functions/v1/get-customer-info'
+const API_URL =
+  'https://ovukfntlauhftpwymvdr.supabase.co/functions/v1/get-customer-info'
 
 function Dashboard() {
   const { customer_id } = useParams()
@@ -52,10 +53,11 @@ function Dashboard() {
             setCustomerProducts([])
           }
           setApiResponse(data)
-          setUserData({
-            name: 'DIEGO',
+          setUserData((prev) => ({
+            ...prev,
+            name: data.customer?.name || prev.name,
             number: customer_id,
-          })
+          }))
           setLoading(false)
           
           // Hacer la llamada a la API en segundo plano para actualizar los datos
@@ -109,11 +111,12 @@ function Dashboard() {
           setCustomerProducts([])
         }
 
-        // Actualizar userData con el customer_id
-        setUserData({
-          name: 'DIEGO', // Esto podría venir de la API también
+        // Actualizar userData con datos del cliente (si existen) y el customer_id
+        setUserData((prev) => ({
+          ...prev,
+          name: data.customer?.name || prev.name,
           number: customer_id,
-        })
+        }))
       } catch (err) {
         console.error('Error fetching customer info:', err)
         
@@ -160,8 +163,8 @@ function Dashboard() {
         'Diego'
       
       const email = 
-        customerData.email || 
-        'diego.gutierrez684@gmail.com'
+        customerData.customer?.email || 
+        'jpirozzim@udd.cl'
 
       // Construir la URL de respuesta (hardcodeada como se solicitó)
       const responseUrl = `http://localhost:5173/payment-success/${customer_id}`
@@ -238,8 +241,8 @@ function Dashboard() {
           <ProductCard
             key={product.id}
             productCode={product.product_code}
-            paymentMethod="Tarjeta **** 4467"
-            hasWarning={true}
+            paymentMethod={product.payment_method}
+            hasWarning={!product.payment_method}
           />
         ))}
       </div>

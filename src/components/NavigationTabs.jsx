@@ -5,7 +5,7 @@ function NavigationTabs({ activeTab, onTabChange }) {
   const tabs = [
     { id: 'cuotas', label: 'Mis Cuotas' },
     { id: 'productos', label: 'Mis Productos' },
-    { id: 'historial', label: 'Historial de Pagos' },
+    // { id: 'historial', label: 'Historial de Pagos' },
   ]
 
   return (
@@ -24,6 +24,11 @@ function NavigationTabs({ activeTab, onTabChange }) {
 }
 
 export default NavigationTabs
+
+
+
+
+
 
 
 
