@@ -167,7 +167,7 @@ function Dashboard() {
         'jpirozzim@udd.cl'
 
       // Construir la URL de respuesta (hardcodeada como se solicitó)
-      const responseUrl = `http://localhost:5173/payment-success/${customer_id}`
+      const responseUrl = `https://portal-pagos.clubdelseguro.cl/payment-success/${customer_id}`
 
       // Llamar a la API de clubdelseguro
       const response = await fetch('https://api.clubdelseguro.cl/api/payment-methods/oneclick/startInscription', {
