@@ -164,7 +164,7 @@ function Dashboard() {
       
       const email = 
         customerData.customer?.email || 
-        'jpirozzim@udd.cl'
+        'generico@gmail.com'
 
       // Construir la URL de respuesta (hardcodeada como se solicitó)
       const responseUrl = `https://portal-pagos.clubdelseguro.cl/payment-success/${customer_id}`
