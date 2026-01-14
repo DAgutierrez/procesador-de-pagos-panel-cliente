@@ -15,6 +15,18 @@
   margin: 0 auto;
 }
 
+.info-alert {
+  background-color: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #1565c0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
 .products-section {
   margin-top: 2rem;
 }

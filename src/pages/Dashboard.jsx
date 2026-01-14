@@ -53,10 +53,27 @@ function Dashboard() {
             setCustomerProducts([])
           }
           setApiResponse(data)
+          // Buscar RUT en múltiples ubicaciones posibles
+          const customerRut = 
+            data.customer?.national_id ||
+            data.customer?.rut || 
+            data.customer?.RUT || 
+            data.customer?.document || 
+            data.customer?.document_id || 
+            data.customer?.tax_id || 
+            data.customer?.dni ||
+            data.customer?.rfc ||
+            data.national_id ||
+            data.rut ||
+            data.RUT ||
+            data.document ||
+            data.document_id ||
+            null
+
           setUserData((prev) => ({
             ...prev,
             name: data.customer?.name || prev.name,
-            number: customer_id,
+            number: customerRut || customer_id,
           }))
           setLoading(false)
           
@@ -87,6 +104,10 @@ function Dashboard() {
 
         const data = await response.json()
 
+        // Debug: Ver estructura de datos para encontrar el RUT
+        console.log('API Response data:', data)
+        console.log('Customer object:', data.customer)
+
         // Guardar la respuesta completa en localStorage (incluso si hay error)
         saveCustomerInfoToStorage(customer_id, data)
         setApiResponse(data)
@@ -101,6 +122,28 @@ function Dashboard() {
             if (stored.customer_products && Array.isArray(stored.customer_products)) {
               setCustomerProducts(stored.customer_products)
             }
+            // Actualizar userData con RUT si está disponible
+            const storedRut = 
+              stored.customer?.national_id ||
+              stored.customer?.rut || 
+              stored.customer?.RUT || 
+              stored.customer?.document || 
+              stored.customer?.document_id || 
+              stored.customer?.tax_id || 
+              stored.customer?.dni ||
+              stored.customer?.rfc ||
+              stored.national_id ||
+              stored.rut ||
+              stored.RUT ||
+              stored.document ||
+              stored.document_id ||
+              null
+
+            setUserData((prev) => ({
+              ...prev,
+              name: stored.customer?.name || prev.name,
+              number: storedRut || customer_id,
+            }))
           } else {
             setError(data.error || 'Error al obtener información del cliente')
             setCustomerProducts([])
@@ -111,11 +154,28 @@ function Dashboard() {
           setCustomerProducts([])
         }
 
-        // Actualizar userData con datos del cliente (si existen) y el customer_id
+        // Actualizar userData con datos del cliente (si existen) y el RUT
+        // Buscar RUT en múltiples ubicaciones posibles
+        const customerRut = 
+          data.customer?.national_id ||
+          data.customer?.rut || 
+          data.customer?.RUT || 
+          data.customer?.document || 
+          data.customer?.document_id || 
+          data.customer?.tax_id || 
+          data.customer?.dni ||
+          data.customer?.rfc ||
+          data.national_id ||
+          data.rut ||
+          data.RUT ||
+          data.document ||
+          data.document_id ||
+          null
+
         setUserData((prev) => ({
           ...prev,
           name: data.customer?.name || prev.name,
-          number: customer_id,
+          number: customerRut || customer_id,
         }))
       } catch (err) {
         console.error('Error fetching customer info:', err)
@@ -129,6 +189,28 @@ function Dashboard() {
             setCustomerProducts(stored.customer_products)
             setApiResponse(stored)
           }
+          // Actualizar userData con RUT si está disponible
+          const storedRut = 
+            stored.customer?.national_id ||
+            stored.customer?.rut || 
+            stored.customer?.RUT || 
+            stored.customer?.document || 
+            stored.customer?.document_id || 
+            stored.customer?.tax_id || 
+            stored.customer?.dni ||
+            stored.customer?.rfc ||
+            stored.national_id ||
+            stored.rut ||
+            stored.RUT ||
+            stored.document ||
+            stored.document_id ||
+            null
+
+          setUserData((prev) => ({
+            ...prev,
+            name: stored.customer?.name || prev.name,
+            number: storedRut || customer_id,
+          }))
         } else {
           setError(err.message || 'Error al cargar la información del cliente')
           setCustomerProducts([])
@@ -261,6 +343,9 @@ function Dashboard() {
                 onRegisterPayment={handleRegisterPayment} 
                 isLoading={registeringPayment}
               />
+              <div className="info-alert">
+                Para modificar tu medio de pago, simplemente inscribe uno nuevo. Será reemplazado por el actual automáticamente.
+              </div>
               <section className="products-section">
                 <h2 className="products-section-title">Mis Productos</h2>
                 {renderProducts()}
