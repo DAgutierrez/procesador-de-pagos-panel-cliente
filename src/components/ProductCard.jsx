@@ -114,7 +114,7 @@ function ProductCard({ productCode, productNumber, paymentMethod, hasWarning }) 
     <div className="product-card">
       <div className="product-card-header">
         <span className="product-card-number">{displayCode}</span>
-        <button className="product-card-menu">
+        {/* <button className="product-card-menu">
           <svg
             width="20"
             height="20"
@@ -126,7 +126,7 @@ function ProductCard({ productCode, productNumber, paymentMethod, hasWarning }) 
             <circle cx="10" cy="10" r="1.5" fill="#666666" />
             <circle cx="10" cy="15" r="1.5" fill="#666666" />
           </svg>
-        </button>
+        </button> */}
       </div>
       <div className="product-card-status">
         No tiene deuda vencida
