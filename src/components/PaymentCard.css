@@ -81,4 +81,266 @@
   }
 }
 
+/* =========================
+   Payment Card (sin deudas)
+========================= */
+.payment-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  border: 1px solid #f0f0f0;
+}
 
+.payment-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+}
+
+.payment-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.payment-card-title {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0;
+  color: #111;
+}
+
+.payment-card-subtitle {
+  margin: 0;
+  color: #777;
+  font-size: 14px;
+}
+
+.payment-card-button {
+  background: #ff6a00;
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.payment-card-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* =========================
+   Debts Table Wrapper
+========================= */
+.debts-wrapper {
+  width: 100%;
+}
+
+.debts-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  border: 1px solid #f0f0f0;
+  overflow-x: auto;
+}
+
+.debts-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px; /* para que no se rompa en pantallas chicas */
+}
+
+.debts-table thead th {
+  text-align: left;
+  font-size: 13px;
+  color: #8a8a8a;
+  font-weight: 700;
+  padding: 14px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.debts-table tbody td {
+  padding: 14px 10px;
+  border-bottom: 1px solid #f2f2f2;
+  font-size: 14px;
+  color: #333;
+  vertical-align: middle;
+}
+
+.debts-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.debts-footer-line {
+  height: 1px;
+  background: #eee;
+  margin-top: 8px;
+}
+
+
+/* =========================
+   Links / Buttons
+========================= */
+.linkish {
+  color: #666;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.muted {
+  color: #aaa;
+}
+
+/* botón tipo link (para "Ver detalles") */
+.link-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  text-decoration: underline;
+  font-size: 14px;
+  padding: 0;
+  font-weight: 600;
+}
+
+.link-button:hover {
+  color: #111;
+}
+
+
+/* =========================
+   Badges
+========================= */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.badge.overdue {
+  background: #ffe6e6;
+  color: #b90000;
+  border: 1px solid #ffb6b6;
+}
+
+
+/* =========================
+   Drawer Modal (Right Panel)
+========================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  justify-content: flex-end; /* ✅ derecha */
+  align-items: stretch;      /* ✅ full alto */
+  z-index: 9999;
+}
+
+/* panel */
+.modal-card {
+  width: 520px;
+  max-width: 92vw;
+  height: 100vh;
+  background: #fff;
+  border-radius: 16px 0 0 16px;
+  padding: 22px 22px 28px;
+  box-shadow: -10px 0 35px rgba(0,0,0,0.18);
+  overflow-y: auto;
+
+  animation: slideIn 0.2s ease-out;
+}
+
+/* animación */
+@keyframes slideIn {
+  from {
+    transform: translateX(30px);
+    opacity: 0.5;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* header modal */
+.modal-header {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+
+.modal-close {
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  cursor: pointer;
+  color: #666;
+}
+
+.modal-close:hover {
+  color: #111;
+}
+
+.modal-title {
+  font-size: 26px;
+  margin: 10px 0 18px;
+  font-weight: 900;
+  color: #111;
+}
+
+/* filas del modal */
+.modal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 1px solid #eee;
+  gap: 12px;
+}
+
+.modal-label {
+  color: #9a9a9a;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.modal-value {
+  color: #555;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: right;
+}
+
+
+/* =========================
+   Responsive fixes
+========================= */
+@media (max-width: 768px) {
+  .payment-card-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .payment-card-button {
+    width: 100%;
+  }
+
+  .modal-card {
+    width: 100%;
+    border-radius: 16px 16px 0 0; /* abajo tipo sheet */
+  }
+}
