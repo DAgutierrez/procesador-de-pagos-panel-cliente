@@ -41,7 +41,7 @@ function Dashboard() {
       if (storedData && storedData.data) {
         console.log('Datos cargados desde localStorage')
         const data = storedData.data
-        
+
         // Si hay un error en la respuesta almacenada, intentar hacer la llamada a la API
         if (data.error) {
           console.log('Error encontrado en datos almacenados, intentando actualizar desde API')
@@ -54,13 +54,13 @@ function Dashboard() {
           }
           setApiResponse(data)
           // Buscar RUT en múltiples ubicaciones posibles
-          const customerRut = 
+          const customerRut =
             data.customer?.national_id ||
-            data.customer?.rut || 
-            data.customer?.RUT || 
-            data.customer?.document || 
-            data.customer?.document_id || 
-            data.customer?.tax_id || 
+            data.customer?.rut ||
+            data.customer?.RUT ||
+            data.customer?.document ||
+            data.customer?.document_id ||
+            data.customer?.tax_id ||
             data.customer?.dni ||
             data.customer?.rfc ||
             data.national_id ||
@@ -76,7 +76,7 @@ function Dashboard() {
             number: customerRut || customer_id,
           }))
           setLoading(false)
-          
+
           // Hacer la llamada a la API en segundo plano para actualizar los datos
           fetchFromAPI()
           return
@@ -123,13 +123,13 @@ function Dashboard() {
               setCustomerProducts(stored.customer_products)
             }
             // Actualizar userData con RUT si está disponible
-            const storedRut = 
+            const storedRut =
               stored.customer?.national_id ||
-              stored.customer?.rut || 
-              stored.customer?.RUT || 
-              stored.customer?.document || 
-              stored.customer?.document_id || 
-              stored.customer?.tax_id || 
+              stored.customer?.rut ||
+              stored.customer?.RUT ||
+              stored.customer?.document ||
+              stored.customer?.document_id ||
+              stored.customer?.tax_id ||
               stored.customer?.dni ||
               stored.customer?.rfc ||
               stored.national_id ||
@@ -156,13 +156,13 @@ function Dashboard() {
 
         // Actualizar userData con datos del cliente (si existen) y el RUT
         // Buscar RUT en múltiples ubicaciones posibles
-        const customerRut = 
+        const customerRut =
           data.customer?.national_id ||
-          data.customer?.rut || 
-          data.customer?.RUT || 
-          data.customer?.document || 
-          data.customer?.document_id || 
-          data.customer?.tax_id || 
+          data.customer?.rut ||
+          data.customer?.RUT ||
+          data.customer?.document ||
+          data.customer?.document_id ||
+          data.customer?.tax_id ||
           data.customer?.dni ||
           data.customer?.rfc ||
           data.national_id ||
@@ -179,7 +179,7 @@ function Dashboard() {
         }))
       } catch (err) {
         console.error('Error fetching customer info:', err)
-        
+
         // Intentar usar datos almacenados si hay error de red
         const storedData = getCustomerInfoFromStorage(customer_id)
         if (storedData && storedData.data && !storedData.data.error) {
@@ -190,13 +190,13 @@ function Dashboard() {
             setApiResponse(stored)
           }
           // Actualizar userData con RUT si está disponible
-          const storedRut = 
+          const storedRut =
             stored.customer?.national_id ||
-            stored.customer?.rut || 
-            stored.customer?.RUT || 
-            stored.customer?.document || 
-            stored.customer?.document_id || 
-            stored.customer?.tax_id || 
+            stored.customer?.rut ||
+            stored.customer?.RUT ||
+            stored.customer?.document ||
+            stored.customer?.document_id ||
+            stored.customer?.tax_id ||
             stored.customer?.dni ||
             stored.customer?.rfc ||
             stored.national_id ||
@@ -238,14 +238,14 @@ function Dashboard() {
 
       // Extraer username y email del localStorage
       // Buscar en diferentes posibles ubicaciones de los datos
-      const username = 
-        customerData.username || 
-        customerData.name || 
-        userData.name || 
+      const username =
+        customerData.username ||
+        customerData.name ||
+        userData.name ||
         'Diego'
-      
-      const email = 
-        customerData.customer?.email || 
+
+      const email =
+        customerData.customer?.email ||
         'generico@gmail.com'
 
       // Construir la URL de respuesta (hardcodeada como se solicitó)
@@ -330,6 +330,10 @@ function Dashboard() {
       </div>
     )
   }
+  const rutValido = userData.number && userData.number.includes("-")
+    ? userData.number
+    : null;
+
 
   return (
     <div className="dashboard">
@@ -339,10 +343,13 @@ function Dashboard() {
         <div className="dashboard-content">
           {activeTab === 'cuotas' && (
             <>
-              <PaymentCard 
-                onRegisterPayment={handleRegisterPayment} 
+              <PaymentCard
+                customerId={apiResponse?.customer?.id}  // ✅ ESTE ES EL BUENO
+                onRegisterPayment={handleRegisterPayment}
                 isLoading={registeringPayment}
               />
+
+
               <div className="info-alert">
                 Para modificar tu medio de pago, simplemente inscribe uno nuevo. Será reemplazado por el actual automáticamente.
               </div>
