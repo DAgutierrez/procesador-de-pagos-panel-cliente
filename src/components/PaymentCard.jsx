@@ -136,6 +136,18 @@ function PaymentCard({
     return (
       <div className="debts-wrapper">
 
+        {/* ✅ Header arriba de la tabla */}
+        <div className="debts-header">
+          <button
+            className="debts-header-button"
+            onClick={onRegisterPayment}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Procesando...' : 'Inscribir medio de pago'}
+          </button>
+        </div>
+
+
         <div className="debts-card">
           <table className="debts-table">
             <thead>
@@ -168,7 +180,6 @@ function PaymentCard({
                   </td>
 
                   <td>
-                    {/* ✅ ahora abre modal */}
                     <button
                       className="link-button"
                       onClick={() => setSelectedDebt(d)}
@@ -194,10 +205,10 @@ function PaymentCard({
             formatPeriodoCL={formatPeriodoCL}
           />
         )}
-
       </div>
     )
   }
+
 
   // ✅ SI NO HAY VENCIDAS: CARD
   return (

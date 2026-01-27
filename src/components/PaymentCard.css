@@ -344,3 +344,31 @@
     border-radius: 16px 16px 0 0; /* abajo tipo sheet */
   }
 }
+
+.debts-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+.debts-header-button {
+  background: #ff6d2d;  /* naranjo */
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.debts-header-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.debts-header-button:hover {
+  filter: brightness(0.95);
+}
+
