@@ -180,6 +180,7 @@ function PaymentCard({
                   </td>
 
                   <td>
+                    {/* ✅ ahora abre modal */}
                     <button
                       className="link-button"
                       onClick={() => setSelectedDebt(d)}
@@ -205,6 +206,7 @@ function PaymentCard({
             formatPeriodoCL={formatPeriodoCL}
           />
         )}
+
       </div>
     )
   }
