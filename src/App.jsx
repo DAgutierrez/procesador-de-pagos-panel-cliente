@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import PaymentSuccess from './pages/PaymentSuccess'
 import TransbankRedirect from './pages/TransbankRedirect'
 import PrivacyPolicy from './pages/PrivacyPolicy'
+import WebpayReturn from './components/WebpayReturn'
 import './App.css'
 
 function App() {
@@ -20,6 +21,10 @@ function App() {
         <Route
           path="/transbank-redirect"
           element={<TransbankRedirect />}
+        />
+        <Route
+          path="/webpay/return"
+          element={<WebpayReturn />}
         />
         <Route path="/politica-privacidad" element={<PrivacyPolicy />} />
       </Routes>

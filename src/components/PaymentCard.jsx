@@ -13,6 +13,61 @@ function PaymentCard({
   // ✅ MODAL
   const [selectedDebt, setSelectedDebt] = useState(null)
 
+  const [isPaying, setIsPaying] = useState(false)
+  const [payError, setPayError] = useState(null)
+
+  const [resolvedCompanyId, setResolvedCompanyId] = useState(null)
+
+  useEffect(() => {
+    if (!customerId) return
+
+    // Si viene por props, listo.
+    if (companyId) {
+      setResolvedCompanyId(companyId)
+      return
+    }
+
+    const fetchCompanyIdFromDebts = async () => {
+      try {
+        // REST directo a tabla debts
+        const url =
+          `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/debts` +
+          `?customer_id=eq.${encodeURIComponent(customerId)}` +
+          `&select=company_id` +
+          `&company_id=not.is.null` +
+          `&limit=1`
+
+        const res = await fetch(url, {
+          method: "GET",
+          headers: {
+            apikey: import.meta.env.VITE_SUPABASE_SERVICE_ANON_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ANON_KEY}`,
+          },
+        })
+
+        const json = await res.json().catch(() => [])
+
+        if (!res.ok) {
+          console.error("❌ debts REST error:", json)
+          setResolvedCompanyId(null)
+          return
+        }
+
+        const cid =
+          Array.isArray(json) && json.length > 0 ? json[0]?.company_id : null
+
+        setResolvedCompanyId(cid ?? null)
+        console.log("✅ resolvedCompanyId:", cid)
+      } catch (e) {
+        console.error("❌ fetchCompanyIdFromDebts error:", e)
+        setResolvedCompanyId(null)
+      }
+    }
+
+    fetchCompanyIdFromDebts()
+  }, [customerId, companyId])
+
+
   const parseDateSafe = (dateStr) => {
     if (!dateStr) return null
 
@@ -48,17 +103,11 @@ function PaymentCard({
     const d = parseDateSafe(dateStr)
     if (!d) return '-'
 
-    // ✅ Mes en español, con primera letra mayúscula
     const month = new Intl.DateTimeFormat('es-CL', { month: 'long' }).format(d)
     const monthCap = month.charAt(0).toUpperCase() + month.slice(1)
-
-    // ✅ Año
     const year = d.getFullYear()
-
-    // ✅ Formato exacto: "Enero, 2026"
     return `${monthCap}, ${year}`
   }
-
 
   // ✅ Calcula si está vencida: pending + due_date ya pasó
   const overdueDebts = useMemo(() => {
@@ -74,6 +123,91 @@ function PaymentCard({
     })
   }, [debts])
 
+  // ✅ Total de TODAS las deudas vencidas (preseleccionadas sí o sí)
+  const totalToPay = useMemo(() => {
+    return overdueDebts.reduce((acc, d) => acc + Number(d.amount || 0), 0)
+  }, [overdueDebts])
+
+  const handlePayAll = async () => {
+    if (overdueDebts.length === 0) return
+
+    try {
+      setIsPaying(true)
+      setPayError(null)
+
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/webpay-integration`
+
+      const buy_order = `CUST-${customerId}-${Date.now()}`
+      const session_id = `SID-${customerId}-${Date.now()}`
+
+      // ✅ Da igual si Webpay no respeta querystring: guardamos el id en storage igual
+      const return_url = `${window.location.origin}/webpay/return?customer_id=${encodeURIComponent(customerId)}`
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: import.meta.env.VITE_SUPABASE_SERVICE_ANON_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          buy_order,
+          session_id,
+          amount: totalToPay,
+          return_url,
+
+          // Extra útil para tu backend
+          customer_id: customerId,
+          company_id: resolvedCompanyId,
+          debt_ids: overdueDebts.map((d) => d.id),
+          external_ids: overdueDebts.map((d) => d.external_id).filter(Boolean),
+        }),
+      })
+
+      const json = await res.json().catch(() => ({}))
+
+      if (!res.ok) {
+        console.error('❌ Error creando transacción Webpay:', json)
+        setPayError('No se pudo iniciar el pago. Intenta nuevamente.')
+        return
+      }
+
+      const token = json.token
+      const redirectBaseUrl = json.url
+
+      if (!redirectBaseUrl || !token) {
+        console.error('❌ Respuesta inválida de webpay-integration:', json)
+        setPayError('Respuesta inválida de pago (sin token/url).')
+        return
+      }
+
+      // ✅ Guardar customerId para recuperarlo en /webpay/return
+      // sessionStorage es por pestaña; localStorage es más robusto por si cambia contexto
+      sessionStorage.setItem('last_customer_id', String(customerId))
+      localStorage.setItem('last_customer_id', String(customerId))
+      console.log('Saved last_customer_id:', customerId)
+
+      // ✅ Redirección correcta a Webpay: POST con token_ws (NO GET)
+      const form = document.createElement('form')
+      form.method = 'POST'
+      form.action = redirectBaseUrl
+
+      const input = document.createElement('input')
+      input.type = 'hidden'
+      input.name = 'token_ws'
+      input.value = token
+
+      form.appendChild(input)
+      document.body.appendChild(form)
+      form.submit()
+    } catch (e) {
+      console.error('❌ Error inesperado pagando:', e)
+      setPayError('Error inesperado iniciando pago.')
+    } finally {
+      setIsPaying(false)
+    }
+  }
+
   useEffect(() => {
     if (!customerId) return
 
@@ -83,19 +217,15 @@ function PaymentCard({
 
         const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get_debs_by_customerId`
 
-        const res = await fetch(
-          url,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              // ⚠️ OJO: NO uses service_role en frontend en producción (te pueden robar el proyecto)
-              'apikey': import.meta.env.VITE_SUPABASE_SERVICE_ANON_KEY,
-              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ANON_KEY}`
-            },
-            body: JSON.stringify({ customer_id: customerId })
-          }
-        )
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: import.meta.env.VITE_SUPABASE_SERVICE_ANON_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ customer_id: customerId }),
+        })
 
         const json = await res.json()
 
@@ -135,7 +265,6 @@ function PaymentCard({
   if (overdueDebts.length > 0) {
     return (
       <div className="debts-wrapper">
-
         {/* ✅ Header arriba de la tabla */}
         <div className="debts-header">
           <button
@@ -146,7 +275,6 @@ function PaymentCard({
             {isLoading ? 'Procesando...' : 'Inscribir medio de pago'}
           </button>
         </div>
-
 
         <div className="debts-card">
           <table className="debts-table">
@@ -165,7 +293,7 @@ function PaymentCard({
               {overdueDebts.map((d) => (
                 <tr key={d.id}>
                   <td>
-                    <input type="checkbox" />
+                    <input type="checkbox" checked readOnly disabled />
                   </td>
 
                   <td>{formatAmountCLP(d.amount)}</td>
@@ -180,7 +308,6 @@ function PaymentCard({
                   </td>
 
                   <td>
-                    {/* ✅ ahora abre modal */}
                     <button
                       className="link-button"
                       onClick={() => setSelectedDebt(d)}
@@ -196,6 +323,29 @@ function PaymentCard({
           <div className="debts-footer-line" />
         </div>
 
+        <div className="debts-footer">
+          <div className="debts-footer-left">
+            <strong>{overdueDebts.length}</strong> cuotas seleccionadas
+          </div>
+
+          <div className="debts-footer-right">
+            <div className="debts-total">
+              <span>Total a pagar</span>
+              <strong>{formatAmountCLP(totalToPay)}</strong>
+            </div>
+
+            <button
+              className="pay-button"
+              onClick={handlePayAll}
+              disabled={isPaying || totalToPay <= 0}
+            >
+              {isPaying ? 'Procesando...' : 'Pagar'}
+            </button>
+          </div>
+        </div>
+
+        {payError && <div className="debts-error">{payError}</div>}
+
         {/* ✅ MODAL */}
         {selectedDebt && (
           <DebtDetailsModal
@@ -206,11 +356,9 @@ function PaymentCard({
             formatPeriodoCL={formatPeriodoCL}
           />
         )}
-
       </div>
     )
   }
-
 
   // ✅ SI NO HAY VENCIDAS: CARD
   return (
@@ -238,17 +386,24 @@ function PaymentCard({
 export default PaymentCard
 
 // ✅ COMPONENTE MODAL
-function DebtDetailsModal({ debt, onClose, formatAmountCLP, formatDateCL, formatPeriodoCL }) {
+function DebtDetailsModal({
+  debt,
+  onClose,
+  formatAmountCLP,
+  formatDateCL,
+  formatPeriodoCL,
+}) {
   const patente = debt.patent ?? '-'
   const compania = debt.company_name ?? '-'
   const periodo = formatPeriodoCL(debt.due_date)
-
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={onClose}>
+            ✕
+          </button>
         </div>
 
         <h2 className="modal-title">Detalles cuota</h2>
@@ -267,33 +422,23 @@ function DebtDetailsModal({ debt, onClose, formatAmountCLP, formatDateCL, format
           <span className="modal-label">Estado</span>
 
           {(() => {
-            const status = (debt.status ?? "").toString().trim().toLowerCase()
+            const status = (debt.status ?? '').toString().trim().toLowerCase()
 
-            // ✅ Si viene overdue desde backend
-            if (status === "overdue") {
-              return <span className="badge overdue">Vencida</span>
-            }
+            if (status === 'overdue') return <span className="badge overdue">Vencida</span>
+            if (status === 'paid') return <span className="badge paid">Pagada</span>
 
-            // ✅ Si viene paid
-            if (status === "paid") {
-              return <span className="badge paid">Pagada</span>
-            }
-
-            // ✅ Si viene pending pero ya venció por fecha
             const today = new Date()
             today.setHours(0, 0, 0, 0)
-
-            const due = debt.due_date ? new Date(debt.due_date + "T00:00:00") : null
+            const due = debt.due_date ? new Date(debt.due_date + 'T00:00:00') : null
             const isOverdue = due && due < today
 
-            if (status === "pending" && isOverdue) {
+            if (status === 'pending' && isOverdue) {
               return <span className="badge overdue">Vencida</span>
             }
 
             return <span className="badge pending">Pendiente</span>
           })()}
         </div>
-
 
         <div className="modal-row">
           <span className="modal-label">Producto</span>
@@ -323,5 +468,3 @@ function DebtDetailsModal({ debt, onClose, formatAmountCLP, formatDateCL, format
     </div>
   )
 }
-
-
