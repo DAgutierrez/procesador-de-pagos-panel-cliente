@@ -232,35 +232,16 @@ function Dashboard() {
     setRegisteringPayment(true)
 
     try {
-      // Obtener datos del cliente desde localStorage
-      const storedData = getCustomerInfoFromStorage(customer_id)
-      const customerData = storedData?.data || {}
-
-      // Extraer username y email del localStorage
-      // Buscar en diferentes posibles ubicaciones de los datos
-      const username =
-        customerData.username ||
-        customerData.name ||
-        userData.name ||
-        'Diego'
-
-      const email =
-        customerData.customer?.email ||
-        'generico@gmail.com'
-
-      // Construir la URL de respuesta (hardcodeada como se solicitó)
-      const responseUrl = `https://portal-pagos.clubdelseguro.cl/payment-success/${customer_id}`
+      // Obtener datos del cliente desde localStorag
 
       // Llamar a la API de clubdelseguro
-      const response = await fetch('https://api.clubdelseguro.cl/api/payment-methods/oneclick/startInscription', {
+      const response = await fetch('https://ovukfntlauhftpwymvdr.supabase.co/functions/v1/start-inscription-oneclick', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: username,
-          email: email,
-          response_url: responseUrl,
+          customer_id: customer_id,
         }),
       })
 
