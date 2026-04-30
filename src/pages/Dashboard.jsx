@@ -14,6 +14,15 @@ import './Dashboard.css'
 const API_URL =
   'https://ovukfntlauhftpwymvdr.supabase.co/functions/v1/get-customer-info'
 
+const filterActiveCustomerProducts = (products) => {
+  if (!Array.isArray(products)) return []
+
+  return products.filter((product) => {
+    if (!product || typeof product !== 'object') return false
+    return product.deleted_at == null && product.deletedAt == null
+  })
+}
+
 function Dashboard() {
   const { customer_id } = useParams()
   const navigate = useNavigate()
@@ -47,11 +56,7 @@ function Dashboard() {
           console.log('Error encontrado en datos almacenados, intentando actualizar desde API')
         } else {
           // Usar datos almacenados
-          if (data.customer_products && Array.isArray(data.customer_products)) {
-            setCustomerProducts(data.customer_products)
-          } else {
-            setCustomerProducts([])
-          }
+          setCustomerProducts(filterActiveCustomerProducts(data.customer_products))
           setApiResponse(data)
           // Buscar RUT en múltiples ubicaciones posibles
           const customerRut =
@@ -119,9 +124,7 @@ function Dashboard() {
           if (storedData && storedData.data && !storedData.data.error) {
             console.log('Usando datos almacenados debido a error en API')
             const stored = storedData.data
-            if (stored.customer_products && Array.isArray(stored.customer_products)) {
-              setCustomerProducts(stored.customer_products)
-            }
+            setCustomerProducts(filterActiveCustomerProducts(stored.customer_products))
             // Actualizar userData con RUT si está disponible
             const storedRut =
               stored.customer?.national_id ||
@@ -149,7 +152,7 @@ function Dashboard() {
             setCustomerProducts([])
           }
         } else if (data.customer_products && Array.isArray(data.customer_products)) {
-          setCustomerProducts(data.customer_products)
+          setCustomerProducts(filterActiveCustomerProducts(data.customer_products))
         } else {
           setCustomerProducts([])
         }
@@ -186,7 +189,7 @@ function Dashboard() {
           console.log('Usando datos almacenados debido a error de red')
           const stored = storedData.data
           if (stored.customer_products && Array.isArray(stored.customer_products)) {
-            setCustomerProducts(stored.customer_products)
+            setCustomerProducts(filterActiveCustomerProducts(stored.customer_products))
             setApiResponse(stored)
           }
           // Actualizar userData con RUT si está disponible
